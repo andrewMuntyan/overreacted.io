@@ -1,22 +1,24 @@
 ---
-title: A Complete Guide to useEffect
+title: Полное руководство по useEffect
 date: '2019-03-09'
-spoiler: Effects are a part of your data flow.
+spoiler: Эффекты - част ьпотока данных.
 ---
 
-You wrote a few components with [Hooks](https://reactjs.org/docs/hooks-intro.html). Maybe even a small app. You’re mostly satisfied. You’re comfortable with the API and picked up a few tricks along the way. You even made some [custom Hooks](https://reactjs.org/docs/hooks-custom.html) to extract repetitive logic (300 lines gone!) and showed it off to your colleagues. “Great job”, they said.
+Вы уже написали несколько компонентов, используя [Хуки](https://reactjs.org/docs/hooks-intro.html). Может даже небольшое приложение.
+Вы по большей части довольны. Чувствуете себя вполне уверенно в обращении с API и использовали несколько трюков в процессе написания компонентов. Вы даже создали несколько [собственных Хуков](https://reactjs.org/docs/hooks-custom.html), которые убрали повторяющуюся от компонента к компоненту логику (код похудел на 300 строк!). Вы показали все это своим коллегам. "Круто", - сказали они.
 
-But sometimes when you `useEffect`, the pieces don’t quite fit together. You have a nagging feeling that you’re missing something. It seems similar to class lifecycles... but is it really? You find yourself asking questions like:
+Но все же иногда при использовании `useEffect` не все части мозаики сходятся. И появляется раздражающее ощущение, что вы что-то упустили. Использование `useEffect` похоже на использование методов жизненного цикла компонента. Но похоже ли? И вы ловите себя на мысли, что некоторые вопросы остались без ответа. Вопросы типа таких:
 
-* 🤔 How do I replicate `componentDidMount` with `useEffect`?
-* 🤔 How do I correctly fetch data inside `useEffect`? What is `[]`?
-* 🤔 Do I need to specify functions as effect dependencies or not?
-* 🤔 Why do I sometimes get an infinite refetching loop?
-* 🤔 Why do I sometimes get an old state or prop value inside my effect?
+* 🤔 Как с помощью `useEffect` повторить логику `componentDidMount`?
+* 🤔 Как правильно отправлять запросы на получение данных внутри `useEffect`? Что такое `[]`?
+* 🤔 Нужно ли указывать функции в качестве зависимостей Эффекта?
+* 🤔 Почему иногда, при отправке запроса на получение данных внутри Эффекта, получается так, что Эффект вызывается бесконечное количество раз?
+* 🤔 Почему иногда внутри своего Эффекта я вижу старые значения `state` и `props`?
 
-When I just started using Hooks, I was confused by all of those questions too. Even when writing the initial docs, I didn’t have a firm grasp on some of the subtleties. I’ve since had a few “aha” moments that I want to share with you. **This deep dive will make the answers to these questions look obvious to you.**
+Эти вопросы также приводили меня легкое замешательство, когда я только начал использовать Хуки. Даже на момент написания первых версий документации у меня все еще не было твердого понимания некоторых тонкостей.
+С тех пор у меня было несколько "ага!" моментов, которыми я хочу с вами поделиться. **Это глубокое погружение сделает ответы на эти вопросы для вас очевидными.**
 
-To *see* the answers, we need to take a step back. The goal of this article isn’t to give you a list of bullet point recipes. It’s to help you truly “grok” `useEffect`. There won’t be much to learn. In fact, we’ll spend most of our time *un*learning.
+Чтобы *увидеть* ответы, нам нужно сделать шаг назад. Целью этой статьи не является дать вам список рецептов. Цель - помочь вам действительно "въехать" в `useEffect`. Здесь нечему будет учиться. На самом деле, мы проведем большую часть времени *раз*учиваясь.
 
 **It’s only after I stopped looking at the `useEffect` Hook through the prism of the familiar class lifecycle methods that everything came together for me.**
 
