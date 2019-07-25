@@ -64,7 +64,7 @@ spoiler: Эффекты - част ьпотока данных.
 
 ---
 
-Я надеюсь это краткое содержание статьи было полезным! Если нет, давайте разбираться дальше.
+Я надеюсь это краткое содержание было полезным! Если нет, давайте разбираться дальше.
 
 ---
 
@@ -91,7 +91,7 @@ function Counter() {
 
 Что это значит? Может быть `count` каким то образом "отслеживает" изменения в нашем `state` и обновляется автоматически когда `state` изменяется? Это могло бы быть вашей первой догадкой в том случае, если бы вы только начали изучать React, но это *не* [точная ментальная модель](https://overreacted.io/react-as-a-ui-runtime/).
 
-**В этом примере `count` это просто число.** Это не магический дата байндинг, не "вотчер", не “прокси” и не что-нибудь подобное вышеперечисленному. Это старое доброе число, точно такое же, как и тут:
+**В этом примере `count` - это просто число.** Это не магический дата байндинг, не "вотчер", не “прокси” и не что-нибудь подобное вышеперечисленному. Это старое доброе число, точно такое же, как и тут:
 
 ```jsx
 const count = 42;
@@ -189,7 +189,7 @@ function Counter() {
 
 Давайте, [попробуйте сами!](https://codesandbox.io/s/w2wxl3yo0l)
 
-Если увиденное не совсем ясно для вас, представьте более практический пример: приложение-чат со значением `ID` текущего адресата в `state` и кнопка `Отправить`. [Эта статья](https://overreacted.io/how-are-function-components-different-from-classes/) подробно рассказывает о причинах, но правильный ответ - `alert` покажет 3
+Если увиденное не совсем понятно, представьте более практический пример: приложение-чат со значением `ID` текущего адресата в `state` и кнопка `Отправить`. [Эта статья](https://overreacted.io/how-are-function-components-different-from-classes/) подробно рассказывает о причинах, но правильный ответ - `alert` покажет 3
 
 Вызов `alert` "захватывает" `state` в тот момент, когда я нажимаю на кнопку.
 
@@ -275,7 +275,7 @@ function Counter() {
     }, 3000);
   }
   // ...
-  <button onClick={handleAlertClick} /> // Этот экземпляр "запомнил" значение 0
+  <button onClick={handleAlertClick} /> // Этот экземпляр `handleAlertClick` "запомнил" значение 0
   // ...
 }
 
@@ -288,7 +288,7 @@ function Counter() {
     }, 3000);
   }
   // ...
-  <button onClick={handleAlertClick} /> // Этот экземпляр "запомнил" значение 1
+  <button onClick={handleAlertClick} /> // Этот экземпляр `handleAlertClick` "запомнил" значение 1
   // ...
 }
 
@@ -301,7 +301,7 @@ function Counter() {
     }, 3000);
   }
   // ...
-  <button onClick={handleAlertClick} /> // Этот экземпляр "запомнил" значение 2
+  <button onClick={handleAlertClick} /> // Этот экземпляр `handleAlertClick` "запомнил" значение 2
   // ...
 }
 ```
@@ -325,125 +325,126 @@ function Component() {
 }
 ```
 
-## Each Render Has Its Own Effects
+## Каждый цикл Рендера компонента имеет свои собственные Эффекты
 
-This was supposed to be a post about effects but we still haven’t talked about effects yet! We’ll rectify this now. Turns out, effects aren’t really any different.
+Это должен был быть пост об Эффектах, но мы еще даже не начали о них говорить! Сейчас мы это исправим. Оказывается, об Эффектах можно сказать все то, что мы говорили выше об обработчиках событий, `props` и `state`.
 
-Let’s go back to an example from [the docs](https://reactjs.org/docs/hooks-effect.html):
+Давайте вернемся к примеру из [документации] (https://ru.reactjs.org/docs/hooks-effect.html):
 
 ```jsx{4-6}
 function Counter() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    document.title = `You clicked ${count} times`;
+    document.title = `Вы нажали: ${count} раз`;
   });
 
   return (
     <div>
-      <p>You clicked {count} times</p>
+      <p>Вы нажали: {count} раз</p>
       <button onClick={() => setCount(count + 1)}>
-        Click me
+        Нажми на меня
       </button>
     </div>
   );
 }
 ```
 
-**Here’s a question for you: how does the effect read the latest `count` state?**
+**У меня к вам вопрос: как Эффект получает "самое свежее" значение `count` из `state`?**
 
-Maybe, there’s some kind of “data binding” or “watching” that makes `count` update live inside the effect function? Maybe `count` is a mutable variable that React sets inside our component so that our effect always sees the latest value?
+Может быть, есть какай-то "дата байндинг" или "вотчинг", который в реальном времени обновляет значение `count` внутри функции-Эффекта? Может быть `count` - это мутабельная переменная, значение которой постоянно изменяется React'ом, и, таким образом, Эффект всегда "видит" последнее ее значение?
 
-Nope.
+Нет.
 
-We already know that `count` is constant within a particular component render. Event handlers “see” the `count` state from the render that they “belong” to because `count` is a variable in their scope. The same is true for effects!
+Мы уже знаем, что `count` остается неизменным в рамках одного цикла рендера компонента. Даже обработчики событий "видят" значение `count` из того рендера, к которому эти обработчики "принадлежат". Все потому, что `count` - это переменная в их области видимости. То же верно и для функции-Эффекта!
 
-**It’s not the `count` variable that somehow changes inside an “unchanging” effect. It’s the _effect function itself_ that’s different on every render.**
+**Это не переменная `count` изменяется внутри “неизменяемого” Эффекта. Это _сама функция-Эффект_ обновляется в каждом новом цикле рендера**
 
-Each version “sees” the `count` value from the render that it “belongs” to:
+Каждая новая версия функции-Эффекта "видит" значение `count` из цикла рендера, к которому "принадлежит" эта функция-Эффект:
 
 ```jsx{5-8,17-20,29-32}
-// During first render
+// Во время первого цикла рендера
 function Counter() {
   // ...
   useEffect(
-    // Effect function from first render
+    // функция-Эффект из первого цикла рендера
     () => {
-      document.title = `You clicked ${0} times`;
+      document.title = `Вы нажали ${0} раз`;
     }
   );
   // ...
 }
 
-// After a click, our function is called again
+// После нажатия на кнопку наша функция-Компонент вызывается снова,
+// Происходит еще один цикл рендера
 function Counter() {
   // ...
   useEffect(
-    // Effect function from second render
+    // уже "другая/новая" функция-Эффект из второго цикла рендера
     () => {
-      document.title = `You clicked ${1} times`;
+       document.title = `Вы нажали ${1} раз`;
     }
   );
   // ...
 }
 
-// After another click, our function is called again
+// После еще одного нажатия наша функция-Компонент вызывается снова
 function Counter() {
   // ...
   useEffect(
-    // Effect function from third render
+    // функция-Эффект из третьего цикла рендера
     () => {
-      document.title = `You clicked ${2} times`;
+       document.title = `Вы нажали ${2} раз`;
     }
   );
   // ..
 }
 ```
 
-React remembers the effect function you provided, and runs it after flushing changes to the DOM and letting the browser paint the screen.
+React запоминает функцию, которую вы передали в Эффект, и вызывает ее после отправки браузеру свежей версии DOM, позволяя ему перерисовать экран.
 
-So even if we speak of a single conceptual *effect* here (updating the document title), it is represented by a *different function* on every render — and each effect function “sees” props and state from the particular render it “belongs” to.
+Таким образом, даже если мы говорим о единственном концептуальном **эффекте** (обновление заголовка документа), то он представлен **разными функциями** для каждого цикла рендера. И каждая такая функция "видит" `props` и `state` из конкретного цикла рендера, того, к которому "принадлежит".
 
-**Conceptually, you can imagine effects are a *part of the render result*.**
+**Концептуально, вы можете думать об Эффектах, как о *части результатов рендера*.**
 
-Strictly saying, they’re not (in order to [allow Hook composition](https://overreacted.io/why-do-hooks-rely-on-call-order/) without clumsy syntax or runtime overhead). But in the mental model we’re building up, effect functions *belong* to a particular render in the same way that event handlers do.
-
----
-
-To make sure we have a solid understanding, let’s recap our first render:
-
-* **React:** Give me the UI when the state is `0`.
-* **Your component:**
-  * Here’s the render result:
-  `<p>You clicked 0 times</p>`.
-  * Also remember to run this effect after you’re done: `() => { document.title = 'You clicked 0 times' }`.
-* **React:** Sure. Updating the UI. Hey browser, I’m adding some stuff to the DOM.
-* **Browser:** Cool, I painted it to the screen.
-* **React:** OK, now I’m going to run the effect you gave me.
-  * Running `() => { document.title = 'You clicked 0 times' }`.
+Строго говоря, они не являются результатами рендера (с целью обеспечения [возможности композиции Хуков](https://overreacted.io/why-do-hooks-rely-on-call-order/) без применения странного синтаксиса и ухудшения быстродействия). Но в ментальной модели, которую мы строим, функции-Эффекты *принадлежат* к конкретному циклу рендера точно также, как это происходит с обработчиками событий.
 
 ---
 
-Now let’s recap what happens after we click:
+Чтобы убедиться, что у нас есть четкое понимание, давайте пройдемся по нашему первому рендеру:
 
-* **Your component:** Hey React, set my state to `1`.
-* **React:** Give me the UI for when the state is `1`.
-* **Your component:**
-  * Here’s the render result:
-  `<p>You clicked 1 times</p>`.
-  * Also remember to run this effect after you’re done: `() => { document.title = 'You clicked 1 times' }`.
-* **React:** Sure. Updating the UI. Hey browser, I’ve changed the DOM.
-* **Browser:** Cool, I painted your changes to the screen.
-* **React:** OK, now I’ll run the effect that belongs to the render I just did.
-  * Running `() => { document.title = 'You clicked 1 times' }`.
+* **React:** Дай мне UI когда `count` в `state` равен `0`.
+* **Ваш компонент:**
+  * Вот результаты рендера:
+  `<p>Вы нажали 0 раз</p>`.
+  * И еще не забудь выполнить этот Эффект, после того, как закончишь: `() => { document.title = 'Вы нажали 0 раз' }`.
+* **React:** Конечно. Обновляю UI. Эй, Браузер, я кое-что добавляю в DOM.
+* **Браузер:** Круто, сейчас я отрисую это на экране.
+* **React:** OK, сейчас я собираюсь выполнить тот Эффект, который дал мне компонент.
+  * Выполняю `() => { document.title = 'Вы нажали 0 раз' }`.
 
 ---
 
-## Each Render Has Its Own... Everything
+Теперь давайте вспомним что происходит после нажатия на кнопку:
 
-**We know now that effects run after every render, are conceptually a part of the component output, and “see” the props and state from that particular render.**
+* **Ваш компонент:** Эй React, измени значение `count` в `state` с `0` на `1`.
+* **React:** Дай мне UI когда `count` в `state` равен `1`.
+* **Ваш компонент:**
+  * Вот результаты рендера:
+  `<p>Вы нажали 1 раз</p>`.
+  * И еще не забудь выполнить этот Эффект, после того, как закончишь: `() => { document.title = 'Вы нажали 1 раз' }`.
+* **React:** Конечно. Обновляю UI. Эй, Браузер, я изменил DOM.
+* **Браузер:** Круто, я отрисовал твои изменения на экране.
+* **React:** OK, теперь я запущу Эффект, которая принадлежит к рендеру, который я только что сделал.
+  * Запускаю `() => { document.title = 'You clicked 1 times' }`.
 
-Let’s try a thought experiment. Consider this code:
+---
+
+## Каждый цикл Рендера компонента имеет свои собственные... Да Все
+
+**Теперь мы знаем, что Эффекты, которые запускаются после каждого рендера, концептуально являются частью того, что компонент отдает React'у. Мы знаем также, что Эффекты "видят" те `props` и `state`, которые принадлежат к конкретному циклу рендера**
+
+Давайте проведем мысленный эксперимент. Представьте такой код:
 
 ```jsx{4-8}
 function Counter() {
@@ -451,42 +452,42 @@ function Counter() {
 
   useEffect(() => {
     setTimeout(() => {
-      console.log(`You clicked ${count} times`);
+      console.log(`Вы нажали ${count} раз`);
     }, 3000);
   });
 
   return (
     <div>
-      <p>You clicked {count} times</p>
+      <p>Вы нажали {count} раз</p>
       <button onClick={() => setCount(count + 1)}>
-        Click me
+        Нажми меня
       </button>
     </div>
   );
 }
 ```
 
-If I click several times with a small delay, what is the log going to look like?
+Как будет выглядеть результат `console.log`, если я нажму на кнопку несколько раз с небольшими перерывами?
 
 ---
 
-*spoilers ahead*
+*Осторожно, спойлеры*
 
 ---
 
-You might think this is a gotcha and the end result is unintuitive. It’s not! We’re going to see a sequence of logs — each one belonging to a particular render and thus with its own `count` value. You can [try it yourself](https://codesandbox.io/s/lyx20m1ol):
+Вы можете подумать, что это ловушка, и что конечный результат не логичен. Но это не так! Мы увидим последовательность результатов `console.log` - каждый из которых принадлежит определенному рендеру и, таким образом, имеет свое собственное значение `count`. Можете [сами попробовать](https://codesandbox.io/s/lyx20m1ol):
 
+![Запись экрана, на которой показано как 1, 2, 3, 4, 5 выводятся последовательно](./timeout_counter.gif)
 
-![Screen recording of 1, 2, 3, 4, 5 logged in order](./timeout_counter.gif)
+Вы можете подумать: «Конечно это работает так! Как еще это может работать?
 
-You may think: “Of course that’s how it works! How else could it work?”
+Ну, это отличается от того, как `this.state` работает в классах. Легко ошибиться, если подумать, что вот в такой [реализации с помощью класса](https://codesandbox.io/s/kkymzwjqz3) мы увидим тот же результат:
 
-Well, that’s not how `this.state` works in classes. It’s easy to make the mistake of thinking that this [class implementation](https://codesandbox.io/s/kkymzwjqz3) is equivalent:
 
 ```jsx
   componentDidUpdate() {
     setTimeout(() => {
-      console.log(`You clicked ${this.state.count} times`);
+      console.log(`Вы нажали ${this.state.count} раз`);
     }, 3000);
   }
 ```
